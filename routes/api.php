@@ -1,32 +1,23 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-
-
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'access'
-], function ($router) {
+// Rotas para autenticação
+Route::prefix('access')->middleware('api')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
-    // Route::post('logout', [AuthController::class, 'logout']);
-    // Route::post('refresh', [AuthController::class, 'refresh']);
-    // Route::post('me', [AuthController::class, 'me']);
 });
 
-Route::middleware(['auth:api', 'role:admin'])->group(function () {
-    // Rotas protegidas para administradores
-    Route::get('admin', function () {
-        return 'Area do Administrador';
-    });
+// Rotas para administradores
+Route::prefix('admin')->middleware(['api', 'auth:api', 'role:admin'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index']);
 });
 
-Route::middleware(['auth:api', 'role:user'])->group(function () {
-    // Rotas protegidas para usuários
+// Rotas públicas acessíveis a todos os usuários autenticados
+Route::middleware('auth:api')->group(function () {
     Route::get('user', function () {
-        return 'Area do usuario';
+        return response()->json(['message' => 'Olá usuário.']);
     });
 });
