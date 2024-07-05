@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
 use Illuminate\Support\Facades\Route;
@@ -15,13 +16,19 @@ Route::prefix('dashboard')->middleware(['api', 'auth:api'])->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
 });
 
-// Rotas para Equipamentos
-Route::prefix('equipments')->middleware(['api', 'auth:api'])->group(function () {
-    Route::get('/', [EquipmentController::class, 'index']);
-    Route::post('/', [EquipmentController::class, 'store']);
-    Route::get('{id}', [EquipmentController::class, 'show']);
-    Route::put('{id}', [EquipmentController::class, 'update']);
-    Route::delete('{id}', [EquipmentController::class, 'destroy']);
+Route::prefix('branches')->middleware(['api', 'auth:api'])->group(function () {
+
+    Route::get('/equipments', [BranchController::class, 'getAllEquipments']);
+
+    Route::prefix('{branch}')->group(function () {
+        Route::prefix('equipments')->group(function () {
+            Route::get('/', [EquipmentController::class, 'index']);
+            Route::post('/', [EquipmentController::class, 'store']);
+            Route::get('{equipment}', [EquipmentController::class, 'show']);
+            Route::put('{equipment}', [EquipmentController::class, 'update']);
+            Route::delete('{equipment}', [EquipmentController::class, 'destroy']);
+        });
+    });
 });
 
 // // Rotas para Histórico de Manutenções

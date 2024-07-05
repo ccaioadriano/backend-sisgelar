@@ -71,6 +71,6 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->assignRole($userRole);
 
-        $this->call(EquipmentSeeder::class);
+        $this->call([BranchSeeder::class,]);
     }
 }

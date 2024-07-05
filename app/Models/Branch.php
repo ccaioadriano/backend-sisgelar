@@ -5,14 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Equipment extends Model
+class Branch extends Model
 {
     use HasFactory;
 
-    protected $table = 'equipments';
-
-    public function branch()
+    public function equipments()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->hasMany(Equipment::class);
     }
 }
