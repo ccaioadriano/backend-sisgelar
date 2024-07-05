@@ -70,5 +70,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('user123'),
         ]);
         $user->assignRole($userRole);
+
+        $this->call(EquipmentSeeder::class);
     }
 }
