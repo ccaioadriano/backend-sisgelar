@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('access')->middleware('api')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
+    Route::middleware('auth:api')->get('me', [AuthController::class, 'me']);
 });
 
 Route::prefix('dashboard')->middleware(['api', 'auth:api'])->group(function () {
@@ -23,7 +24,7 @@ Route::prefix('branches')->middleware(['api', 'auth:api'])->group(function () {
     Route::prefix('{branch}')->group(function () {
         Route::prefix('equipments')->group(function () {
             Route::get('/', [EquipmentController::class, 'index']);
-            Route::post('/', [EquipmentController::class, 'store']);
+            Route::middleware(['role_or_permission:Super Admin|Admin Org'])->post('/', [EquipmentController::class, 'store']);
             Route::get('{equipment}', [EquipmentController::class, 'show']);
             Route::put('{equipment}', [EquipmentController::class, 'update']);
             Route::delete('{equipment}', [EquipmentController::class, 'destroy']);

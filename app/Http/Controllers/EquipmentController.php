@@ -12,12 +12,28 @@ class EquipmentController extends Controller
     public function index(Branch $branch)
     {
         // Retorna todos os equipamentos da filial especificada
-        $equipments = $branch->equipments()->get();
+        $equipments = $branch->equipments()->paginate(columns: [
+            "type",
+            "brand",
+            "client",
+            "disabled"
+        ]);
         return response()->json($equipments);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Branch $branch)
     {
+
+        $data = $request->validate([
+            'type' => 'required',
+            'brand' => 'required',
+            'client' => 'required',
+            'disabled' => 'boolean',
+        ]);
+
+        $equipment = $branch->equipments()->create($data);
+
+        return response()->json($equipment, 201);
     }
 
     public function show($id)

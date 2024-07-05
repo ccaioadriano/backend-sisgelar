@@ -11,6 +11,15 @@ class Equipment extends Model
 
     protected $table = 'equipments';
 
+    protected $fillable = [
+        'type',
+        'brand',
+        'client',
+        'disabled',
+        'disabled',
+        'branch_id'
+    ];
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);

@@ -31,4 +31,10 @@ class AuthController extends Controller
         );
         return $user;
     }
+
+    public function me()
+    {
+        $user = User::find(auth()->user()->id);
+        return response()->json($user);
+    }
 }

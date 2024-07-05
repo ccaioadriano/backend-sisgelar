@@ -14,7 +14,7 @@ class BranchController extends Controller
 
     public function getAllEquipments()
     {
-        $equipments = Equipment::all();
+        $equipments = Equipment::paginate();
         return response()->json($equipments);
     }
 }
