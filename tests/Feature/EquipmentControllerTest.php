@@ -1,17 +1,40 @@
 <?php
 
-namespace Database\Seeders;
-
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Database\Seeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
-class DatabaseSeeder extends Seeder
+class EquipmentControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected $manager;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Certifique-se de que o banco de dados de teste esteja migrado
+        $this->artisan('migrate');
+
+        // Gerar roles e permissões
+        $this->generateRolesAndPermissions();
+
+        // Criar um usuário manager
+        $this->manager = User::factory()->create([
+            'name' => 'manager',
+            'email' => 'manager@sisgelar.com',
+            'password' => Hash::make('123'),
+        ]);
+        $this->manager->assignRole('manager');
+    }
+
     public function generateRolesAndPermissions()
     {
         // Lista de permissões gerais
@@ -31,11 +54,11 @@ class DatabaseSeeder extends Seeder
                 'manage_organization', 'assign_permissions',
                 'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
             ],
-            'organization_admin' => [
+            'org_admin' => [
                 'manage_organization', 'assign_permissions',
                 'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
             ],
-            'equipment_manager' => [
+            'manager' => [
                 'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
             ],
         ];
@@ -54,32 +77,7 @@ class DatabaseSeeder extends Seeder
             }
         }
     }
-
-    public function createUser($userName, $roleName)
+    public function can_be_created()
     {
-        $user = User::create([
-            'name' => $userName,
-            'email' => $userName . '@sisgelar.com',
-            'password' => Hash::make('123'),
-        ]);
-
-        // Associa o usuário à role
-        $role = Role::where('name', $roleName)->first();
-        $user->assignRole($role);
-
-        return $user;
-    }
-
-    public function run(): void
-    {
-        // Criação de usuários com roles
-        $this->generateRolesAndPermissions();
-        $this->createUser('super_admin', 'super_admin');
-        $this->createUser('org_admin', 'organization_admin');
-        $this->createUser('equipment_manager', 'equipment_manager');
-
-
-
-        $this->call([BranchSeeder::class,]);
     }
 }
