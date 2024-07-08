@@ -19,17 +19,18 @@ Route::prefix('dashboard')->middleware(['api', 'auth:api'])->group(function () {
 
 Route::prefix('branches')->middleware(['api', 'auth:api'])->group(function () {
 
-    Route::get('/equipments', [BranchController::class, 'getAllEquipments']);
+    Route::prefix('{branch_id}')->group(function () {
 
-    Route::prefix('{branch}')->group(function () {
-        Route::prefix('equipments')->group(function () {
+        Route::prefix('equipments')->middleware(['role_or_permission:super_admin|organization_admin|equipment_manager'])->group(function () {
             Route::get('/', [EquipmentController::class, 'index']);
-            Route::middleware(['role_or_permission:Super Admin|Admin Org'])->post('/', [EquipmentController::class, 'store']);
-            Route::get('{equipment}', [EquipmentController::class, 'show']);
-            Route::put('{equipment}', [EquipmentController::class, 'update']);
-            Route::delete('{equipment}', [EquipmentController::class, 'destroy']);
+            Route::post('/', [EquipmentController::class, 'store']);
+            Route::get('/{equipment}', [EquipmentController::class, 'show']);
+            Route::patch('/{equipment}', [EquipmentController::class, 'update']);
+            Route::delete('/{equipment}', [EquipmentController::class, 'destroy']);
         });
     });
+
+    Route::get('/equipments', [BranchController::class, 'getAllEquipments']);
 });
 
 // // Rotas para Histórico de Manutenções

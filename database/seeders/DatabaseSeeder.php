@@ -12,64 +12,73 @@ use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
+    public function generateRolesAndPermissions()
+    {
+        // Lista de permissões gerais
+        $permissions = [
+            // Permissões de gerenciamento de grupos e usuários
+            'manage_all_groups', 'manage_all_permissions',
+            'manage_organization', 'assign_permissions',
+
+            // Permissões de gestão de equipamentos
+            'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
+        ];
+
+        // Perfis de usuários e suas permissões específicas
+        $roles = [
+            'super_admin' => [
+                'manage_all_groups', 'manage_all_permissions',
+                'manage_organization', 'assign_permissions',
+                'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
+            ],
+            'organization_admin' => [
+                'manage_organization', 'assign_permissions',
+                'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
+            ],
+            'equipment_manager' => [
+                'view_equipment', 'create_equipment', 'edit_equipment', 'delete_equipment',
+            ],
+        ];
+
+        // Criação das permissões
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
+
+        // Criação das roles e associação de permissões
+        foreach ($roles as $roleName => $rolePermissions) {
+            $role = Role::create(['name' => $roleName]);
+            foreach ($rolePermissions as $permissionName) {
+                $permission = Permission::where('name', $permissionName)->first();
+                $role->givePermissionTo($permission);
+            }
+        }
+    }
+
+    public function createUser($userName, $roleName)
+    {
+        $user = User::create([
+            'name' => $userName,
+            'email' => $userName . '@sisgelar.com',
+            'password' => Hash::make('123'),
+        ]);
+
+        // Associa o usuário à role
+        $role = Role::where('name', $roleName)->first();
+        $user->assignRole($role);
+
+        return $user;
+    }
+
     public function run(): void
     {
-        // Criação de permissões
-        Permission::create(['name' => 'manage all groups and permissions']);
-        Permission::create(['name' => 'manage specific organ context']);
-        Permission::create(['name' => 'crud equipments']);
-        Permission::create(['name' => 'view reports']);
-        Permission::create(['name' => 'view dashboard']);
+        // Criação de usuários com roles
+        $this->generateRolesAndPermissions();
+        $this->createUser('super_admin_user', 'super_admin');
+        $this->createUser('org_admin', 'organization_admin');
+        $this->createUser('equipment_manager', 'equipment_manager');
 
-        // Criação de papéis e atribuição de permissões
-        $superAdminRole = Role::create(['name' => 'Super Admin']);
-        $superAdminRole->givePermissionTo([
-            'manage all groups and permissions',
-            'manage specific organ context',
-            'crud equipments',
-            'view reports',
-            'view dashboard',
-        ]);
 
-        $adminRole = Role::create(['name' => 'Admin Org']);
-        $adminRole->givePermissionTo([
-            'manage specific organ context',
-            'crud equipments',
-            'view reports',
-            'view dashboard',
-        ]);
-
-        $userRole = Role::create(['name' => 'User']);
-        $userRole->givePermissionTo([
-            'crud equipments',
-            'view reports',
-            'view dashboard',
-        ]);
-
-        // Criação de usuários e atribuição de papéis
-        $superAdmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@admin.com',
-            'password' => Hash::make('superadmin123'),
-        ]);
-        $superAdmin->assignRole($superAdminRole);
-
-        $adminOrg = User::create([
-            'name' => 'Admin Org',
-            'email' => 'adminorg@org.com',
-            'password' => Hash::make('adminorg123'),
-        ]);
-        $adminOrg->assignRole($adminRole);
-
-        $user = User::create([
-            'name' => 'User',
-            'email' => 'user@user.com',
-            'password' => Hash::make('user123'),
-        ]);
-        $user->assignRole($userRole);
 
         $this->call([BranchSeeder::class,]);
     }

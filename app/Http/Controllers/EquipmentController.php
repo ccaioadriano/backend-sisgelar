@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 
 class EquipmentController extends Controller
 {
-    public function index(Branch $branch)
+    public function index($branch_id)
     {
         // Retorna todos os equipamentos da filial especificada
+        $branch = Branch::findOrFail($branch_id);
         $equipments = $branch->equipments()->paginate(columns: [
+            "id",
             "type",
             "brand",
             "client",
@@ -36,16 +38,36 @@ class EquipmentController extends Controller
         return response()->json($equipment, 201);
     }
 
-    public function show($id)
+    public function show($branch_id, $equipment_id)
     {
-        return Equipment::findOrFail($id);
+        $branch = Branch::findOrFail($branch_id);
+        $equipment = $branch->equipments()->findOrFail($equipment_id);
+        return response()->json($equipment);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $branch_id, $equipment_id)
     {
+        $branch = Branch::findOrFail($branch_id);
+        $equipment = $branch->equipments()->findOrFail($equipment_id);
+
+        $data = $request->validate([
+            'type' => 'required',
+            'brand' => 'required',
+            'client' => 'required',
+            'disabled' => 'boolean',
+        ]);
+
+        $equipment->update($data);
+
+        return response()->json($equipment, 200);
     }
 
-    public function destroy($id)
+    public function destroy($branch_id, $equipment_id)
     {
+        $branch = Branch::findOrFail($branch_id);
+        $equipment = $branch->equipments()->findOrFail($equipment_id);
+
+        $equipment->deleteOrFail();
+        return response()->json($branch->equipments(), 200);
     }
 }

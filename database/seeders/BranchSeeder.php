@@ -54,19 +54,7 @@ class BranchSeeder extends Seeder
             'disabled' => false,
         ]);
 
-        // Criar usuários associados às filiais
-        User::factory()->create([
-            'name' => 'Admin Filial A',
-            'email' => 'admin_filiala@example.com',
-            'password' => bcrypt('123'),
-            'branch_id' => $branchA->id,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Admin Filial B',
-            'email' => 'admin_filialb@example.com',
-            'password' => bcrypt('123'),
-            'branch_id' => $branchB->id,
-        ]);
+        
     }
 }
+

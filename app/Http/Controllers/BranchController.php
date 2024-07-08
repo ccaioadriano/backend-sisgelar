@@ -9,7 +9,7 @@ class BranchController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['role_or_permission:Super Admin|Admin Org']);
+        $this->middleware(['role_or_permission:super_admin|organization_admin']);
     }
 
     public function getAllEquipments()
