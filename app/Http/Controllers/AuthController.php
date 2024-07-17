@@ -14,10 +14,10 @@ class AuthController extends Controller
         $credentials = $request->only('name', 'password');
 
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Invalid Credentials'], 401);
+            return response()->json(['message' => 'Invalid Credentials'], 401);
         }
 
-        return response()->json(['token' => $token]);
+        return $this->respondWithToken($token);
     }
 
     public function register(Request $request)
@@ -31,10 +31,23 @@ class AuthController extends Controller
         );
         return $user;
     }
-
     public function me()
     {
         $user = User::find(auth()->user()->id);
-        return response()->json($user);
+        return response()->json([
+            'permissions' => $user->permissions(),
+            'roles' => $user->roles,
+            'user' => $user->me(),
+            'success' => true,
+        ]);
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        ]);
     }
 }
