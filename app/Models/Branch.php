@@ -20,6 +20,6 @@ class Branch extends Model
     {
         return $this->hasOne(User::class)->whereHas('roles', function ($query) {
             $query->where('name', 'org_admin');
-        });
+        })->where('branch_id', $this->id);
     }
 }

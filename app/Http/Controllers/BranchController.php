@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BranchResource;
+use App\Models\Branch;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
 
@@ -9,12 +11,14 @@ class BranchController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['role_or_permission:super_admin|organization_admin']);
+        $this->middleware('role_or_permission:super_admin');
     }
 
-    public function getAllEquipments()
+
+    public function index()
     {
-        $equipments = Equipment::paginate();
-        return response()->json($equipments);
+
+        $branches = Branch::paginate();
+        return BranchResource::collection($branches);
     }
 }

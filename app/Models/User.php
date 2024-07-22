@@ -70,14 +70,4 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Branch::class);
     }
-
-    public function me()
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'branch' => $this->branch ? $this->branch : null,
-        ];
-    }
 }

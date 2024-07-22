@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,13 +12,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return response()->json($users);
+        return response()->json(UserResource::collection($users));
     }
 
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return response()->json($user);
+        return response()->json(new UserResource($user));
     }
 
     public function store(Request $request)
@@ -64,7 +65,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return response()->json($user);
+        return response()->json(new UserResource($user));
     }
 
     public function destroy($id)

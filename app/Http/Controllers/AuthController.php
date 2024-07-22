@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +17,6 @@ class AuthController extends Controller
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['message' => 'Invalid Credentials'], 401);
         }
-
         return $this->respondWithToken($token);
     }
 
@@ -31,23 +31,14 @@ class AuthController extends Controller
         );
         return $user;
     }
-    public function me()
-    {
-        $user = User::find(auth()->user()->id);
-        return response()->json([
-            'permissions' => $user->permissions(),
-            'roles' => $user->roles,
-            'user' => $user->me(),
-            'success' => true,
-        ]);
-    }
-
     protected function respondWithToken($token)
     {
+        $user = auth()->user();
         return response()->json([
-            'token' => $token,
-            'token_type' => 'bearer',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'user' => new UserResource($user)
         ]);
     }
 }
