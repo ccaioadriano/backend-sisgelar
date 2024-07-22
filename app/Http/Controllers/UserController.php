@@ -12,13 +12,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return response()->json(UserResource::collection($users));
+        return UserResource::collection($users);
     }
 
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return response()->json(new UserResource($user));
+        return new UserResource($user);
     }
 
     public function store(Request $request)
@@ -65,7 +65,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return response()->json(new UserResource($user));
+        return new UserResource($user);
     }
 
     public function destroy($id)

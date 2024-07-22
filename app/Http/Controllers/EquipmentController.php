@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BranchResource;
 use App\Http\Resources\EquipmentResource;
 use App\Models\Branch;
 use App\Models\Equipment;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 
 class EquipmentController extends Controller
@@ -15,25 +17,24 @@ class EquipmentController extends Controller
         $this->middleware('role_or_permission:super_admin|organization_admin|equipment_manager')->except('index', 'show');
     }
 
-    public function index($branch_id)
+    public function index()
     {
-        $branch = Branch::findOrFail($branch_id);
-        $equipments = $branch->equipments()->paginate();
+        $equipments = Equipment::all();
         return EquipmentResource::collection($equipments);
     }
 
     public function store(Request $request, Branch $branch)
     {
         $data = $request->validate([
-            'type' => 'required',
-            'brand' => 'required',
-            'client' => 'required',
+            'type' => 'required|string',
+            'brand' => 'required|string',
+            'client' => 'required|string',
             'disabled' => 'boolean',
         ]);
 
         $equipment = $branch->equipments()->create($data);
 
-        return new EquipmentResource($equipment);
+        return response()->json(['message' => 'Equipment Created.', 'equipment' => $equipment], 201);
     }
 
     public function show($branch_id, $equipment_id)
@@ -48,16 +49,12 @@ class EquipmentController extends Controller
         $branch = Branch::findOrFail($branch_id);
         $equipment = $branch->equipments()->findOrFail($equipment_id);
 
-        $data = $request->validate([
-            'type' => 'required',
-            'brand' => 'required',
-            'client' => 'required',
-            'disabled' => 'boolean',
-        ]);
+        $equipment->update($request->all());
 
-        $equipment->update($data);
-
-        return new EquipmentResource($equipment);
+        return response()->json([
+            'message' => 'Equipment Updated.',
+            'equipment' => new EquipmentResource($equipment)
+        ], 200);
     }
 
     public function destroy($branch_id, $equipment_id)
@@ -66,6 +63,8 @@ class EquipmentController extends Controller
         $equipment = $branch->equipments()->findOrFail($equipment_id);
 
         $equipment->deleteOrFail();
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Equipment Deleted.'
+        ], 204);
     }
 }

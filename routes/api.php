@@ -21,8 +21,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:api'])->group(function () {
         Route::get('branches/', [BranchController::class, 'index']);
+        Route::get('branches/{branch_id}', [BranchController::class, 'show']);
+        Route::get('/equipments', [EquipmentController::class, 'index']);
         Route::prefix('branches/{branch_id}/equipments')->group(function () {
-            Route::get('/', [EquipmentController::class, 'index']);
             Route::post('/', [EquipmentController::class, 'store']);
             Route::get('{equipment}', [EquipmentController::class, 'show']);
             Route::patch('{equipment}', [EquipmentController::class, 'update']);
@@ -30,8 +31,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
-
-
 
 // // Rotas para Histórico de Manutenções
 // Route::prefix('maintenance-history')->middleware(['api', 'auth:api'])->group(function () {

@@ -20,6 +20,13 @@ class EquipmentResource extends JsonResource
             'brand' => $this->brand,
             'client' => $this->client,
             'disabled' => $this->disabled ? true : false,
+            'branch' => [
+                'branchId' => $this->branch->id,
+                'name' => $this->branch->name,
+                'contact' => ['phone' => $this->branch->contact, 'email' => $this->branch->email],
+                'address' => $this->branch->address,
+                'description' => $this->branch->description,
+            ]
         ];
     }
 }

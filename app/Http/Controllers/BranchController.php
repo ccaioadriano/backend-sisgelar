@@ -21,4 +21,10 @@ class BranchController extends Controller
         $branches = Branch::paginate();
         return BranchResource::collection($branches);
     }
+
+    public function show(int $branch_id)
+    {
+        $branch = Branch::findOrFail($branch_id);
+        return new BranchResource($branch);
+    }
 }
