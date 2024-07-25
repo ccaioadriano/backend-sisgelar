@@ -13,6 +13,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'permissions' => $this->getAllPermissions()->pluck('name'),
             'roles' => $this->roles->pluck('name'),
+            'branch' => new BranchResource($this->branch)
         ];
     }
 }
